@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>~2026.11.19 수능 플래너</title>
+    <!-- Tailwind CSS (정상 동작하는 CDN 주소로 전면 수정) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    scale: {
+                        '102': '1.02',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome 아이콘 팩 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 구글 폰트 (Inter & 한국어 최적화 Noto Sans KR) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+        }
+        /* 고급스러운 스크롤바 디자인 */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* 중요 마일스톤 은은한 박동 애니메이션 */
+        @keyframes subtlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+        }
+        .important-pulse {
+            animation: subtlePulse 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen antialiased selection:bg-rose-100 selection:text-rose-900">
+
+    <div class="max-w-7xl mx-auto px-4 py-6 md:py-10 space-y-6">
+        
+        <!-- 상단 헤더 영역 -->
+        <header class="flex flex-col md:flex-row md:items-center md:justify-between bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-rose-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md">D-DAY</span>
+                    <h1 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+                        <span class="text-rose-600 font-black">~2026.11.19</span>
+                    </h1>
+                </div>
+                <p class="text-xs text-slate-500 font-bold tracking-wide">2027학년도 수능 인서울 목표</p>
+            </div>
+            
+            <!-- 우측 제어 도구 및 클라우드 연동 상태창 -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <!-- 구글 프로필 로그인 버튼 영역 -->
+                <div id="auth-status-container" class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200/50">
+                    <div id="auth-loading" class="flex items-center text-xs font-bold text-slate-500">
+                        <i class="fa-solid fa-circle-notch animate-spin mr-1.5"></i> 동기화 서버 연결중...
+                    </div>
+                    <div id="auth-logged-out" class="hidden">
+                        <button onclick="handleGoogleSignIn()" class="px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 text-xs font-black rounded-lg border border-slate-200 transition duration-200 flex items-center shadow-xs">
+                            <i class="fa-brands fa-google text-rose-500 mr-1.5"></i> 구글 계정 연동
+                        </button>
+                    </div>
+                    <div id="auth-logged-in" class="hidden flex items-center space-x-2">
+                        <img id="user-profile-img" src="" class="w-6 h-6 rounded-full border border-slate-200" alt="Profile" onerror="this.src='https://placehold.co/40x40/6366f1/ffffff?text=U'">
+                        <div class="flex flex-col">
+                            <span id="user-display-name" class="text-[10px] font-black text-slate-800 leading-tight">사용자</span>
+                            <span class="text-[8px] text-emerald-600 font-bold flex items-center leading-none">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block mr-1"></span> 실시간 동기화 완료
+                            </span>
+                        </div>
+                        <button onclick="handleSignOut()" class="text-[10px] font-bold text-slate-400 hover:text-slate-600 bg-white hover:bg-slate-100 px-1.5 py-0.5 border border-slate-200/80 rounded" title="연동 해제">
+                            로그아웃
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="restorePreviousDay()" id="btn-restore" class="px-3.5 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition duration-200 flex items-center shadow-sm" title="어제 상태로 전면 복구 (이월 취소)">
+                    <i class="fa-solid fa-rotate-left mr-1.5 text-slate-500"></i> 이전 날로 복구
+                </button>
+                
+                <!-- 월별 캘린더 모달 호출 버튼 -->
+                <button onclick="openMonthlyCalendarModal()" class="px-3.5 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition duration-200 flex items-center shadow-sm" title="전체 한 달 달력으로 학습 현황 보기">
+                    <i class="fa-solid fa-calendar-days mr-1.5 text-emerald-500"></i> 월별 보기
+                </button>
+
+                <button onclick="advanceOneDay()" class="px-4 py-2 text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl transition duration-200 flex items-center shadow-md shadow-indigo-200">
+                    <i class="fa-solid fa-calendar-plus mr-1.5"></i> 다음 날로 이동 (이월 실행)
+                </button>
+                
+                <button onclick="toggleApiSettings()" class="p-2.5 text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200/70 rounded-xl transition" title="API 설정">
+                    <i class="fa-solid fa-gear text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 구글 연동 유저의 고유식별자(UID) 정보 노출 영역 -->
+        <div id="uid-disclosure-card" class="hidden bg-slate-900 text-slate-300 p-3 rounded-xl border border-slate-800 text-[10px] flex flex-wrap items-center justify-between gap-2 shadow-inner">
+            <span class="font-bold uppercase tracking-wider text-slate-400">
+                <i class="fa-solid fa-fingerprint text-indigo-400 mr-1"></i> 현재 동기화 활성 계정 고유식별자 (UID)
+            </span>
+            <code id="full-user-uid" class="bg-slate-800 px-2 py-1 rounded text-emerald-400 font-mono select-all">불러오는 중...</code>
+        </div>
+
+        <!-- API 키 설정 모달 -->
+        <div id="api-panel" class="hidden bg-white border border-slate-200 p-5 rounded-2xl shadow-md space-y-3 max-w-md ml-auto">
+            <div class="flex justify-between items-center">
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center">
+                    <i class="fa-solid fa-key text-indigo-500 mr-1.5"></i> Gemini API 키 설정
+                </h4>
+                <button onclick="toggleApiSettings()" class="text-slate-400 hover:text-slate-600 text-xs font-semibold">닫기</button>
+            </div>
+            <p class="text-[11px] text-slate-500 leading-relaxed">AI 분석 및 계획 쪼개기 기능을 사용하고 싶으실 때 개인 API 키를 등록해 보세요.</p>
+            <div class="flex gap-2">
+                <input type="password" id="api-key-input" placeholder="AI API Key 입력 (AI-xxxxx...)" class="flex-1 text-xs border border-slate-200 px-3 py-2 rounded-lg focus:outline-none focus:border-indigo-500">
+                <button onclick="saveApiKey()" class="text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 px-4 py-2 rounded-lg transition shrink-0">저장</button>
+            </div>
+        </div>
+
+        <!-- 대시보드 스탯 보드 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-calendar-day text-lg"></i>
+                </div>
+                <div>
+                    <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">오늘 날짜</span>
+                    <span id="stat-date" class="text-sm font-extrabold text-slate-900">2026-07-05</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-fire text-lg text-rose-600 animate-pulse"></i>
+                </div>
+                <div>
+                    <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">연속 열공일</span>
+                    <span id="stat-streak" class="text-sm font-extrabold text-slate-900">0일째</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-list-check text-lg"></i>
+                </div>
+                <div>
+                    <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">오늘 완료율</span>
+                    <span id="stat-progress" class="text-sm font-extrabold text-slate-900">0%</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-check-double text-lg"></i>
+                </div>
+                <div>
+                    <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">완강한 인강수</span>
+                    <span id="stat-completed-lectures" class="text-sm font-extrabold text-slate-900">0개</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 메인 컨텐츠 영역 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- 왼쪽: 오늘의 스케줄 / 할 일 플래너 (7칸) -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <div class="space-y-1">
+                            <h2 class="font-black text-slate-900 text-lg flex items-center">
+                                <i class="fa-solid fa-clipboard-list text-indigo-600 mr-2"></i> 오늘의 학습 일정
+                            </h2>
+                            <p class="text-[11px] text-slate-400">완료한 항목은 보존되고, 미완료 일과는 다음 날로 자동 이월됩니다.</p>
+                        </div>
+                        <button onclick="openTaskModal()" class="px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition flex items-center">
+                            <i class="fa-solid fa-plus mr-1"></i> 일반 할일
+                        </button>
+                    </div>
+
+                    <!-- 투두 리스트 목록 -->
+                    <div id="todo-list" class="p-6 divide-y divide-slate-100 space-y-2.5">
+                        <!-- Dynamic List Element Inject Area -->
+                    </div>
+                </div>
+
+                <!-- 한국 전통 위인 명언 카드 -->
+                <div class="bg-sky-500 text-white rounded-2xl p-6 relative overflow-hidden shadow-md">
+                    <div class="absolute right-4 bottom-2 text-white/10 opacity-30 text-8xl pointer-events-none">
+                        <i class="fa-solid fa-quote-right"></i>
+                    </div>
+                    <div class="relative z-10 space-y-2.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-100 flex items-center">
+                            <i class="fa-solid fa-landmark mr-1.5 text-xs"></i> 우리 역사 위인들의 한마디
+                        </span>
+                        <blockquote id="national-quote" class="text-sm md:text-base font-bold leading-relaxed text-white">
+                            "진실로 마음을 다해 부지런히 배우고 또 익힌다면 무엇이든 헤쳐나갈 수 있다."
+                        </blockquote>
+                        <cite id="national-author" class="block text-xs text-sky-100 font-semibold not-italic">— 위인 명언 불러오는 중</cite>
+                    </div>
+                </div>
+
+                <!-- 수능 디데이(D-Day) 전용 카드 (하늘색 배경 디자인) -->
+                <div class="bg-gradient-to-r from-sky-100 to-sky-50 border border-sky-200 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
+                    <div class="space-y-1">
+                        <div class="flex items-center space-x-1.5 text-sky-800">
+                            <i class="fa-solid fa-hourglass-half text-sm animate-pulse"></i>
+                            <span class="text-xs font-black uppercase tracking-wider">2027학년도 수능 디데이</span>
+                        </div>
+                        <p class="text-[11px] text-sky-700/80 font-semibold leading-relaxed">우리가 흘린 땀방울은 결코 배신하지 않습니다. 끝까지 용기를 잃지 마세요.</p>
+                    </div>
+                    <div class="text-left sm:text-right shrink-0">
+                        <span id="csat-dday" class="text-3xl font-black text-sky-600 tracking-tighter drop-shadow-sm">D-???</span>
+                        <span class="block text-[10px] font-bold text-sky-500/80 mt-0.5">목표일: 2026.11.19</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오른쪽: 수강 인강 목록 및 AI 센터 (5칸) -->
+            <div class="lg:col-span-5 space-y-6">
+                <!-- 수강 중인 인강 카드 -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-extrabold text-slate-900 text-base flex items-center">
+                            <i class="fa-solid fa-book text-indigo-500 mr-2"></i> 나의 수강 인강 목록
+                        </h3>
+                        <button onclick="openLectureModal()" class="px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition flex items-center">
+                            <i class="fa-solid fa-plus mr-1"></i> 새 인강 등록
+                        </button>
+                    </div>
+
+                    <!-- 인강 카드 리스트 -->
+                    <div id="lecture-list" class="space-y-3 max-h-[350px] overflow-y-auto custom-scrollbar pr-1">
+                        <!-- 인강 목록 주입 공간 -->
+                    </div>
+                </div>
+
+                <!-- AI 학습 연구원 인터랙티브 도구 -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-extrabold text-slate-900 text-sm flex items-center">
+                            <i class="fa-solid fa-wand-magic-sparkles text-violet-500 mr-2"></i> AI 학습 비서 센터
+                        </h3>
+                        <span class="text-[9px] font-bold bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full uppercase">Gemini Inside</span>
+                    </div>
+
+                    <!-- AI 서비스 탭 제어 -->
+                    <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-semibold text-slate-600">
+                        <button onclick="switchAiTab('mentor')" id="tab-btn-mentor" class="py-1.5 rounded-lg text-center bg-white text-slate-900 shadow-sm transition">멘토 챗봇</button>
+                        <button onclick="switchAiTab('planner')" id="tab-btn-planner" class="py-1.5 rounded-lg text-center hover:bg-white/50 transition">계획 쪼개기</button>
+                    </div>
+
+                    <!-- 1. AI 멘토 탭 -->
+                    <div id="ai-tab-mentor" class="space-y-3">
+                        <div id="ai-chat-window" class="border border-slate-100 rounded-xl p-3 bg-slate-50/60 h-40 overflow-y-auto text-xs space-y-2.5 custom-scrollbar">
+                            <div class="bg-white border border-slate-100 p-2 rounded-lg text-slate-600 leading-relaxed shadow-sm">
+                                <strong>💡 AI 학습 도우미</strong><br>수능 인강 플랜, 스터디 슬럼프, 모르는 개념 설명 등 무엇이든 질문하세요!
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="ai-chat-input" placeholder="질문을 입력하세요..." class="flex-1 text-xs border border-slate-200 px-3 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            <button onclick="sendAiChat()" class="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl transition flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. AI 계획 메이커 탭 -->
+                    <div id="ai-tab-planner" class="hidden space-y-3">
+                        <p class="text-[11px] text-slate-500 leading-normal">정복하고 싶은 공부 목표를 말씀하시면, AI가 오늘 실천할 수 있는 세부적인 마이크로 할 일 3가지로 쪼개줍니다.</p>
+                        <div class="space-y-2">
+                            <input type="text" id="ai-plan-topic" placeholder="예: 미적분 삼각함수 파트 완성" class="w-full text-xs border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            <button onclick="generateAiPlan()" id="btn-generate-plan" class="w-full py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 active:scale-98 transition flex items-center justify-center">
+                                <i class="fa-solid fa-puzzle-piece mr-1.5"></i> 3단계 스케줄 생성하기
+                            </button>
+                        </div>
+                        <!-- 추천 결과 영역 -->
+                        <div id="ai-plan-result" class="hidden border border-violet-100 rounded-xl p-3.5 bg-violet-50/40 text-xs space-y-3">
+                            <h5 class="font-bold text-violet-800 flex items-center"><i class="fa-solid fa-circle-nodes mr-1.5"></i> 추천 마이크로 스케줄</h5>
+                            <ul id="ai-plan-list" class="space-y-2 text-slate-600 list-decimal pl-4"></ul>
+                            <button onclick="importAiTasks()" class="w-full py-1.5 bg-violet-600 hover:bg-violet-700 text-white text-[11px] font-black rounded-lg shadow-sm transition">
+                                <i class="fa-solid fa-file-import mr-1"></i> 이 플랜을 오늘의 할 일에 즉시 등록
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 월별 캘린더 보기 모달 창 -->
+    <div id="calendar-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
+            <!-- 캘린더 헤더 -->
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-regular fa-calendar-days text-indigo-500 text-lg"></i>
+                    <h3 class="font-bold text-slate-900">월별 학습 진척 캘린더</h3>
+                </div>
+                <button onclick="closeMonthlyCalendarModal()" class="text-slate-400 hover:text-slate-600 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <!-- 달력 컨트롤러 (월 이동) -->
+            <div class="px-6 py-4 flex items-center justify-between border-b border-slate-50 bg-slate-50/40 shrink-0">
+                <button onclick="moveCalendarMonth(-1)" class="p-2 text-slate-500 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-lg transition border border-slate-200/50">
+                    <i class="fa-solid fa-chevron-left text-sm"></i>
+                </button>
+                <span id="calendar-month-year" class="text-base font-extrabold text-slate-800">2026년 07월</span>
+                <button onclick="moveCalendarMonth(1)" class="p-2 text-slate-500 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-lg transition border border-slate-200/50">
+                    <i class="fa-solid fa-chevron-right text-sm"></i>
+                </button>
+            </div>
+
+            <!-- 요일 행 -->
+            <div class="px-6 pt-3 grid grid-cols-7 gap-1 text-center text-xs font-black text-slate-400 uppercase tracking-wider shrink-0">
+                <div class="text-rose-500">일</div>
+                <div>월</div>
+                <div>화</div>
+                <div>수</div>
+                <div>목</div>
+                <div>금</div>
+                <div class="text-sky-500">토</div>
+            </div>
+
+            <!-- 달력 일자 뷰 영역 -->
+            <div class="p-6 overflow-y-auto custom-scrollbar max-h-[400px]">
+                <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+                    <!-- Day element inject via JavaScript -->
+                </div>
+            </div>
+
+            <!-- 달력 풋터 가이드 -->
+            <div class="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 shrink-0">
+                <div class="flex items-center space-x-3">
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1 inline-block"></span> 완수</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1 inline-block"></span> 진행중</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-slate-200 mr-1 inline-block"></span> 계획없음</span>
+                </div>
+                <span class="font-medium text-indigo-600">날짜를 클릭하면 해당 하루 일과로 즉시 이동합니다.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 새 인강 추가 모달 -->
+    <div id="lecture-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl border border-slate-200 shadow-2xl overflow-hidden">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-bold text-slate-900 flex items-center">
+                    <i class="fa-solid fa-file-pen text-indigo-500 mr-2"></i> 새 인강 등록하기
+                </h3>
+                <button onclick="closeLectureModal()" class="text-slate-400 hover:text-slate-600 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <form id="lecture-form" onsubmit="saveLecture(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">과목 선택</label>
+                    <select id="lecture-subject" onchange="applySubjectDefaultName()" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="korean">국어</option>
+                        <option value="math">수학</option>
+                        <option value="english">영어</option>
+                        <option value="samun">사회문화</option>
+                        <option value="saengyun">생활과 윤리</option>
+                        <option value="history">한국사</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">인강 이름 / 세부 과정명</label>
+                    <input type="text" id="lecture-title" required placeholder="예시: 문학 갈래별 핵심 개념 완성" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">수강 시작일</label>
+                        <input type="date" id="lecture-start-date" required onchange="updateModalExpectedDate()" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">전체 강의 개수 (강)</label>
+                        <input type="number" id="lecture-total" min="1" required oninput="updateModalExpectedDate()" placeholder="예: 30" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">하루 목표 수강량 (강)</label>
+                        <input type="number" id="lecture-daily" min="1" required oninput="updateModalExpectedDate()" placeholder="예: 2" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">이미 수강한 강의 수 (기존 누적)</label>
+                    <input type="number" id="lecture-current" min="0" value="0" required oninput="updateModalExpectedDate()" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <!-- 완강 예정일 실시간 연산 가이드 -->
+                <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-100">
+                    <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                        <i class="fa-solid fa-wand-magic-sparkles text-indigo-500"></i> 완강 일정 자동 연산 프리뷰
+                    </span>
+                    <div id="expected-end-date-preview" class="text-xs">
+                        <span class="text-slate-400">필수 정보를 입력하시면 완강 예상일이 실시간 계산됩니다.</span>
+                    </div>
+                </div>
+
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeLectureModal()" class="w-1/2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-sm transition">취소</button>
+                    <button type="submit" class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition">강의 등록</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 일반 할 일 등록 모달 -->
+    <div id="task-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-2xl border border-slate-200 shadow-2xl overflow-hidden">
+            <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-bold text-slate-900 flex items-center text-sm">
+                    <i class="fa-solid fa-list-check text-indigo-500 mr-2"></i> 할 일 직접 추가하기
+                </h3>
+                <button onclick="closeTaskModal()" class="text-slate-400 hover:text-slate-600 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="task-form" onsubmit="saveCustomTask(event)" class="p-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">할 일 내용</label>
+                    <input type="text" id="task-title" required placeholder="예시: 오답 노트 정리 30분" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeTaskModal()" class="w-1/2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold rounded-lg text-xs transition">취소</button>
+                    <button type="submit" class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition">추가</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 세련된 수험용 커스텀 컨펌 다이얼로그 모달 -->
+    <div id="custom-confirm-modal" class="hidden fixed inset-0 z-[100] bg-slate-950/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xs rounded-2xl border border-slate-200 shadow-2xl overflow-hidden p-5 space-y-4 transform transition-all scale-95">
+            <div class="text-center space-y-2">
+                <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto">
+                    <i class="fa-solid fa-circle-exclamation text-base"></i>
+                </div>
+                <h4 id="confirm-modal-title" class="text-sm font-black text-slate-900">확인이 필요합니다</h4>
+                <p id="confirm-modal-msg" class="text-[11px] text-slate-500 leading-normal">정말로 이 작업을 수행하시겠습니까?</p>
+            </div>
+            <div class="flex space-x-2">
+                <button id="btn-confirm-cancel" class="w-1/2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold rounded-xl text-xs transition">취소</button>
+                <button id="btn-confirm-ok" class="w-1/2 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition">삭제 완료</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 임시 메시지 토스트 -->
+    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[110] bg-slate-950 text-white text-xs px-4 py-2.5 rounded-xl shadow-lg flex items-center space-x-2 transition-all duration-300 opacity-0 transform translate-y-3 pointer-events-none">
+        <span id="toast-message">알림 메시지</span>
+    </div>
+
+    <!-- Firebase Module Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // 글로벌 변수 바인딩
+        window.db = null;
+        window.auth = null;
+        window.googleProvider = null;
+        window.isFirebaseReady = false;
+        window.currentUserId = null;
+        window.unsubscribeSync = null;
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'suneung-planner-2027';
+        let firebaseConfig = null;
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+        } catch(e) {
+            console.error("Firebase config 파싱 실패", e);
+        }
+
+        // 초기 인증 토큰
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                console.warn("Firebase 설정이 제공되지 않았습니다. 로컬 전용 오프라인 모드로 자동 전환합니다.");
+                updateAuthUI(null);
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                window.db = getFirestore(app);
+                window.auth = getAuth(app);
+                window.googleProvider = new GoogleAuthProvider();
+                window.isFirebaseReady = true;
+
+                // 인증 상태 감시자 가동
+                onAuthStateChanged(window.auth, async (user) => {
+                    if (user) {
+                        window.currentUserId = user.uid;
+                        updateAuthUI(user);
+                        await setupRealtimeSync(user.uid);
+                    } else {
+                        // 기본 안전 익명 로그인 보장
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(window.auth, initialAuthToken);
+                            } else {
+                                await signInAnonymously(window.auth);
+                            }
+                        } catch (err) {
+                            console.error("익명 로그인 오류", err);
+                            updateAuthUI(null);
+                        }
+                    }
+                });
+
+            } catch (err) {
+                console.error("Firebase 초기화 에러", err);
+                updateAuthUI(null);
+            }
+        }
+
+        // 클라우드와 로컬스토리지를 연결하는 스마트 동기화 허브
+        async function setupRealtimeSync(userId) {
+            if (window.unsubscribeSync) {
+                window.unsubscribeSync();
+            }
+
+            const docRef = doc(window.db, 'artifacts', appId, 'users', userId, 'planner', 'mainState');
+
+            try {
+                // 첫 로드 시 데이터 검증
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const cloudState = docSnap.data();
+                    // 로컬스토리지 데이터와의 병합 또는 덮어쓰기 분기 처리
+                    mergeCloudData(cloudState);
+                } else {
+                    // 클라우드에 아직 기록이 없는 경우 로컬 데이터를 업로드
+                    await setDoc(docRef, cleanStateForSync(window.state));
+                }
+            } catch (err) {
+                console.error("클라우드 초기 로드 오류", err);
+            }
+
+            // 실시간 양방향 싱크 구독 가동
+            window.unsubscribeSync = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const cloudState = docSnap.data();
+                    if (JSON.stringify(cleanStateForSync(window.state)) !== JSON.stringify(cloudState)) {
+                        mergeCloudData(cloudState);
+                    }
+                }
+            }, (error) => {
+                console.error("실시간 동기화 수신 지연", error);
+            });
+        }
+
+        // 상태값 동기화 최적화 변환기
+        function cleanStateForSync(rawState) {
+            return {
+                currentDate: rawState.currentDate || '2026-07-05',
+                lectures: rawState.lectures || [],
+                tasks: rawState.tasks || [],
+                streak: rawState.streak || 0,
+                history: (rawState.history || []).slice(-5),
+                apiKey: rawState.apiKey || ''
+            };
+        }
+
+        // 로컬 데이터 병합
+        function mergeCloudData(cloudState) {
+            window.state = {
+                currentDate: cloudState.currentDate || '2026-07-05',
+                lectures: cloudState.lectures || [],
+                tasks: cloudState.tasks || [],
+                streak: cloudState.streak || 0,
+                history: cloudState.history || [],
+                apiKey: cloudState.apiKey || ''
+            };
+            window.saveLocalOnly();
+            window.updateUI();
+        }
+
+        // 인증 상태에 따른 UI 반응
+        function updateAuthUI(user) {
+            const authLoading = document.getElementById('auth-loading');
+            const authLoggedOut = document.getElementById('auth-logged-out');
+            const authLoggedIn = document.getElementById('auth-logged-in');
+            const uidCard = document.getElementById('uid-disclosure-card');
+            const fullUidText = document.getElementById('full-user-uid');
+
+            authLoading.classList.add('hidden');
+
+            if (user && !user.isAnonymous) {
+                authLoggedOut.classList.add('hidden');
+                authLoggedIn.classList.remove('hidden');
+                
+                document.getElementById('user-profile-img').src = user.photoURL || '';
+                document.getElementById('user-display-name').innerText = user.displayName || user.email || '동기화 사용자';
+
+                uidCard.classList.remove('hidden');
+                fullUidText.innerText = user.uid;
+            } else {
+                authLoggedIn.classList.add('hidden');
+                authLoggedOut.classList.remove('hidden');
+                uidCard.classList.add('hidden');
+                
+                if (user && user.isAnonymous) {
+                    uidCard.classList.remove('hidden');
+                    fullUidText.innerText = `${user.uid} (게스트)`;
+                }
+            }
+        }
+
+        // 구글 로그인 처리기
+        window.handleGoogleSignIn = async function() {
+            if (!window.isFirebaseReady) {
+                window.showToast("동기화 서버가 실행되지 않았습니다.", "error");
+                return;
+            }
+            try {
+                await signInWithPopup(window.auth, window.googleProvider);
+                window.showToast("구글 계정 연동 및 클라우드 동기화 성공!");
+            } catch (err) {
+                console.error("구글 계정 연동 오류", err);
+                window.showToast("구글 로그인 진행 실패", "error");
+            }
+        };
+
+        // 로그아웃 처리기
+        window.handleSignOut = async function() {
+            if (!window.isFirebaseReady) return;
+            try {
+                await signOut(window.auth);
+                window.showToast("기기 연동이 해제되었습니다.");
+            } catch (err) {
+                console.error("로그아웃 오류", err);
+            }
+        };
+
+        // 클라우드 업로드 위임 함수 정의
+        window.syncStateToCloud = async function() {
+            if (!window.isFirebaseReady || !window.currentUserId) return;
+            const docRef = doc(window.db, 'artifacts', appId, 'users', window.currentUserId, 'planner', 'mainState');
+            try {
+                await setDoc(docRef, cleanStateForSync(window.state));
+            } catch (err) {
+                console.error("클라우드 백업 전송 실패", err);
+            }
+        };
+
+        initializeFirebase();
+    </script>
+
+    <script>
+        // 플래너 글로벌 코어 상태 관리 객체 (처음 접속 시 데이터 완전히 비운 상태로 초기화)
+        window.state = {
+            currentDate: '2026-07-05',
+            lectures: [], 
+            tasks: [],
+            streak: 0,
+            history: [], 
+            apiKey: ''
+        };
+
+        // 캘린더 모달에서 현재 바라보는 연/월 상태 (오늘 날짜 기반 자동 산출)
+        let calendarYear = 2026;
+        let calendarMonth = 7; 
+
+        // 과목별 정밀 테마 매핑 정의
+        const colorClasses = {
+            korean: { 
+                name: '국어',
+                bg: 'bg-amber-500', 
+                text: 'text-amber-700', 
+                border: 'border-amber-200', 
+                accent: 'bg-amber-500', 
+                hover: 'hover:bg-amber-50',
+                badgeBg: 'bg-amber-100'
+            },
+            math: { 
+                name: '수학',
+                bg: 'bg-emerald-600', 
+                text: 'text-emerald-700', 
+                border: 'border-emerald-200', 
+                accent: 'bg-emerald-600', 
+                hover: 'hover:bg-emerald-50',
+                badgeBg: 'bg-emerald-100'
+            },
+            english: { 
+                name: '영어',
+                bg: 'bg-orange-500', 
+                text: 'text-orange-700', 
+                border: 'border-orange-200', 
+                accent: 'bg-orange-500', 
+                hover: 'hover:bg-orange-50',
+                badgeBg: 'bg-orange-100'
+            },
+            samun: { 
+                name: '사회문화',
+                bg: 'bg-violet-600', 
+                text: 'text-violet-700', 
+                border: 'border-violet-200', 
+                accent: 'bg-violet-600', 
+                hover: 'hover:bg-violet-50',
+                badgeBg: 'bg-violet-100'
+            },
+            saengyun: { 
+                name: '생활과윤리',
+                bg: 'bg-purple-600', 
+                text: 'text-purple-700', 
+                border: 'border-purple-200', 
+                accent: 'bg-purple-600', 
+                hover: 'hover:bg-purple-50',
+                badgeBg: 'bg-purple-100'
+            },
+            history: { 
+                name: '한국사',
+                bg: 'bg-stone-600', 
+                text: 'text-stone-700', 
+                border: 'border-stone-200', 
+                accent: 'bg-stone-600', 
+                hover: 'hover:bg-stone-50',
+                badgeBg: 'bg-stone-100'
+            }
+        };
+
+        // 중요 모의고사 및 수능 일정 매핑 정의
+        const SPECIAL_MILESTONES = {
+            '2026-09-02': { title: '🔥 [중요] 9월 모의평가 (평가원 모의고사)', type: 'milestone' },
+            '2026-11-19': { title: '🚨 [D-DAY] 대학수학능력시험 (본수능)', type: 'milestone' }
+        };
+
+        // 한국 명문 위인 명언 데이터베이스 (조선, 고려, 대한민국)
+        const nationalQuotes = [
+            { author: "충무공 이순신 (조선)", text: "집안이 가난하다고 원망하지 마라. 나는 머리가 나쁘다 탓하지 마라. 나는 첫 시험에 낙방하고 서른둘의 늦은 나이에 과거에 겨우 급제했다." },
+            { author: "세종대왕 (조선)", text: "백성이 하고자 하는 일을 이룰 수 있도록 돕는 것, 그것이 내가 해야 할 도리이다. 배움은 날마다 전진하는 것이니 게을리하지 마라." },
+            { author: "백범 김구 (대한민국 독립운동가)", text: "눈길을 걸어갈 때 흐트러지게 걷지 마라. 오늘 내가 남긴 발자국은 마침내 뒷사람의 길이 되리라." },
+            { author: "다산 정약용 (조선)", text: "독서는 인간이 해야 할 첫째가는 깨끗한 일이다. 공부를 한 번 멈추면 이내 머리는 어두워지고 마는 법이다." },
+            { author: "안중근 의사 (대한민국 독립운동가)", text: "하루라도 책을 읽지 아니하면, 입속에 가시가 돋느니라. 뜻을 올곧게 지키고 공부에 전념하라." },
+            { author: "율곡 이이 (조선)", text: "뜻을 세우지 아니하면 학문이 결코 나아갈 수 없다. 배움을 시작하기 전에 가슴 깊이 큰 뜻을 먼저 세워라." },
+            { author: "서희 (고려)", text: "담대한 생각과 치밀한 계획이 있다면 그 어떤 거센 바람이 불어와도 반드시 뜻한 바를 쟁취해 낼 수 있는 법이다." },
+            { author: "원효대사 (신라-고려 정신의 뿌리)", text: "모든 것은 마음먹기에 달렸다. 스스로 할 수 없다고 단정 짓는 마음의 감옥에서 벗어날 때 온전한 지혜가 깨어난다." },
+            { author: "퇴계 이황 (조선)", text: "배움은 마치 물을 거슬러 올라가는 배와 같아서, 오늘 열심히 나아가지 아니하면 도리어 뒤로 미끄러져 가느니라." },
+            { author: "도산 안창호 (대한민국 독립운동가)", text: "낙망은 청년의 죽음이요, 청년이 죽으면 민족이 죽는다. 그대들은 매일 더 나은 실천으로 스스로의 가치를 입증해 가라." }
+        ];
+
+        let tempAiPlanTasks = []; 
+
+        // 토스트 알림 서비스
+        window.showToast = function(msg, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = msg;
+            
+            if (type === "error") {
+                toast.className = toast.className.replace("bg-slate-950", "bg-rose-600");
+            } else {
+                toast.className = toast.className.replace("bg-rose-600", "bg-slate-950");
+            }
+
+            toast.classList.remove('opacity-0', 'translate-y-3');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-3');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2300);
+        }
+
+        // 브라우저의 confirm 차단을 우회하는 커스텀 모달 구동기
+        let pendingConfirmAction = null;
+        function showCustomConfirm(title, msg, onConfirm) {
+            document.getElementById('confirm-modal-title').innerText = title;
+            document.getElementById('confirm-modal-msg').innerText = msg;
+            document.getElementById('custom-confirm-modal').classList.remove('hidden');
+            
+            pendingConfirmAction = onConfirm;
+        }
+
+        document.getElementById('btn-confirm-cancel').addEventListener('click', () => {
+            document.getElementById('custom-confirm-modal').classList.add('hidden');
+            pendingConfirmAction = null;
+        });
+
+        document.getElementById('btn-confirm-ok').addEventListener('click', () => {
+            if (pendingConfirmAction) {
+                pendingConfirmAction();
+            }
+            document.getElementById('custom-confirm-modal').classList.add('hidden');
+            pendingConfirmAction = null;
+        });
+
+        // 로컬 보존 및 클라우드 업로드 호출 통합
+        window.saveLocalOnly = function() {
+            localStorage.setItem('study_planner_state_v2', JSON.stringify(window.state));
+        }
+
+        function saveData() {
+            window.saveLocalOnly();
+            if (window.syncStateToCloud) {
+                window.syncStateToCloud();
+            }
+        }
+
+        // YYYY-MM-DD 산술 연산용 헬퍼 함수
+        function getNextDayDateString(dateStr) {
+            const date = new Date(dateStr);
+            date.setDate(date.getDate() + 1);
+            
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getPreviousDayDateString(dateStr) {
+            const date = new Date(dateStr);
+            date.setDate(date.getDate() - 1);
+            
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 2026.11.19 수능 당일까지의 디데이 계산
+        function calculateCsatDday() {
+            const targetDateStr = "2026-11-19";
+            const curDate = new Date(window.state.currentDate);
+            const targetDate = new Date(targetDateStr);
+            
+            const diffTime = targetDate.getTime() - curDate.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            const dDayEl = document.getElementById('csat-dday');
+            if (diffDays > 0) {
+                dDayEl.innerText = `D-${diffDays}`;
+                dDayEl.className = "text-3xl font-black text-sky-600 tracking-tighter drop-shadow-sm";
+            } else if (diffDays === 0) {
+                dDayEl.innerText = `D-DAY`;
+                dDayEl.className = "text-3xl font-black text-rose-600 tracking-tighter drop-shadow-sm animate-bounce";
+            } else {
+                dDayEl.innerText = `D+${Math.abs(diffDays)}`;
+                dDayEl.className = "text-3xl font-black text-slate-500 tracking-tighter drop-shadow-sm";
+            }
+        }
+
+        // 완강 예상 일정 자동 산출 로직
+        function calculateExpectedEndDate(startDateStr, total, current, daily) {
+            if (!startDateStr || isNaN(total) || isNaN(current) || isNaN(daily) || daily <= 0) {
+                return null;
+            }
+            const remaining = total - current;
+            if (remaining <= 0) return startDateStr;
+            const daysNeeded = Math.ceil(remaining / daily);
+            
+            const date = new Date(startDateStr);
+            date.setDate(date.getDate() + (daysNeeded - 1));
+            
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 완강 계산기 모달 내 실시간 주입
+        window.updateModalExpectedDate = function() {
+            const startDateStr = document.getElementById('lecture-start-date').value;
+            const total = parseInt(document.getElementById('lecture-total').value) || 0;
+            const daily = parseInt(document.getElementById('lecture-daily').value) || 0;
+            const current = parseInt(document.getElementById('lecture-current').value) || 0;
+            
+            const previewEl = document.getElementById('expected-end-date-preview');
+            if (!startDateStr || total <= 0 || daily <= 0) {
+                previewEl.innerHTML = `<span class="text-slate-400">필수 정보를 입력하시면 계산됩니다.</span>`;
+                return;
+            }
+            
+            if (current > total) {
+                previewEl.innerHTML = `<span class="text-rose-500 font-semibold"><i class="fa-solid fa-triangle-exclamation"></i> 수강한 진도수가 전체 강수보다 많습니다.</span>`;
+                return;
+            }
+            
+            const endDateStr = calculateExpectedEndDate(startDateStr, total, current, daily);
+            const remaining = total - current;
+            const daysNeeded = Math.ceil(remaining / daily);
+            
+            if (remaining <= 0) {
+                previewEl.innerHTML = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> 이미 수강 완료(완강) 상태입니다!</span>`;
+            } else {
+                previewEl.innerHTML = `
+                    <div class="text-sky-700 font-bold text-xs flex flex-col gap-1 bg-sky-50/60 p-2.5 rounded-lg border border-sky-100 mt-1">
+                        <div class="flex justify-between items-center">
+                            <span>완강 예상일: <span class="underline text-slate-800 font-extrabold">${endDateStr}</span></span>
+                            <span class="text-[10px] bg-sky-600 text-white px-2 py-0.5 rounded-full font-semibold">완강까지 ${daysNeeded}일 소요</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 과목 선택 시 적절한 임시 과목 가이드 텍스트 자동 채워넣기
+        window.applySubjectDefaultName = function() {
+            const selectEl = document.getElementById('lecture-subject');
+            const titleEl = document.getElementById('lecture-title');
+            const subjectKey = selectEl.value;
+            const subjectName = colorClasses[subjectKey].name;
+            titleEl.placeholder = `예시: ${subjectName} 필수 실전 강좌`;
+        }
+
+        // 날짜를 해시하여 매일 한국의 고정된 다른 명언이 나오도록 설계
+        function updateNationalQuote() {
+            const dateStr = window.state.currentDate; 
+            let hash = 0;
+            for (let i = 0; i < dateStr.length; i++) {
+                hash += dateStr.charCodeAt(i);
+            }
+            const quoteIndex = hash % nationalQuotes.length;
+            const chosenQuote = nationalQuotes[quoteIndex];
+
+            document.getElementById('national-quote').innerText = `"${chosenQuote.text}"`;
+            document.getElementById('national-author').innerText = `— ${chosenQuote.author}`;
+        }
+
+        // Gemini API 호출 공통 유틸리티
+        async function callGeminiAPI(userQuery, systemPrompt = '', responseSchema = null) {
+            const apiKey = window.state.apiKey.trim() || "";
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            
+            const requestBody = {
+                contents: [{
+                    parts: [
+                        { text: systemPrompt ? `${systemPrompt}\n\nUser Question: ${userQuery}` : userQuery }
+                    ]
+                }]
+            };
+
+            if (responseSchema) {
+                requestBody.generationConfig = {
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema
+                };
+            }
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API 응답 실패');
+                }
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch (err) {
+                console.error(err);
+                throw err;
+            }
+        }
+
+        // 로컬 데이터 로딩
+        function loadData() {
+            const savedState = localStorage.getItem('study_planner_state_v2');
+            if (savedState) {
+                try {
+                    window.state = JSON.parse(savedState);
+                    if (!window.state.currentDate) window.state.currentDate = '2026-07-05';
+                    if (!window.state.lectures) window.state.lectures = [];
+                    if (!window.state.tasks) window.state.tasks = [];
+                    if (!window.state.streak) window.state.streak = 0;
+                    if (!window.state.history) window.state.history = [];
+                    if (!window.state.apiKey) window.state.apiKey = '';
+                } catch (e) {
+                    console.error("로컬 백업 데이터 파싱 실패");
+                }
+            } else {
+                window.state.lectures = [];
+                window.state.tasks = [];
+                window.state.currentDate = '2026-07-05';
+            }
+            
+            document.getElementById('api-key-input').value = window.state.apiKey || '';
+        }
+
+        // 오늘의 인강 진도 자동 스케줄링 & 중요 고정 일정 로드
+        function allocateDailyTasksForDate(dateStr) {
+            // 1. 중요 마일스톤(수능, 9월 모의고사) 감지 및 추가
+            const milestone = SPECIAL_MILESTONES[dateStr];
+            if (milestone) {
+                const alreadyHasMilestone = window.state.tasks.some(t => t.date === dateStr && t.type === 'milestone');
+                if (!alreadyHasMilestone) {
+                    window.state.tasks.push({
+                        id: `milestone-${dateStr}`,
+                        title: milestone.title,
+                        completed: false,
+                        date: dateStr,
+                        type: 'milestone',
+                        rolledOver: false
+                    });
+                }
+            }
+
+            // 2. 인강 할일 자동 할당
+            const otherTasks = window.state.tasks.filter(t => t.date !== dateStr || t.type !== 'lecture');
+            const dailyLectureTasks = [];
+
+            window.state.lectures.forEach(lecture => {
+                if (lecture.current >= lecture.total) return;
+
+                // 시작 날짜가 오늘보다 나중이면 패스
+                if (lecture.startDate && new Date(lecture.startDate) > new Date(dateStr)) return;
+
+                const alreadyExists = window.state.tasks.some(t => t.date === dateStr && t.lectureId === lecture.id);
+                if (alreadyExists) return;
+
+                const currentVal = lecture.current;
+                const dailyCount = lecture.daily;
+                const remaining = lecture.total - currentVal;
+                const allocCount = Math.min(dailyCount, remaining);
+
+                for (let i = 1; i <= allocCount; i++) {
+                    const lectureIdx = currentVal + i;
+                    dailyLectureTasks.push({
+                        id: `task-${lecture.id}-${lectureIdx}-${dateStr}`,
+                        lectureId: lecture.id,
+                        title: `[${colorClasses[lecture.color].name}] ${lecture.title} ${lectureIdx}강 수강`,
+                        completed: false,
+                        date: dateStr,
+                        type: 'lecture',
+                        lectureIndex: lectureIdx,
+                        rolledOver: false
+                    });
+                }
+            });
+
+            window.state.tasks = [
+                ...window.state.tasks.filter(t => t.date === dateStr && t.type === 'milestone'),
+                ...otherTasks, 
+                ...window.state.tasks.filter(t => t.date === dateStr && t.type !== 'lecture' && t.type !== 'milestone'), 
+                ...dailyLectureTasks
+            ];
+        }
+
+        // 인강 추가 모달 제어
+        window.openLectureModal = function() {
+            document.getElementById('lecture-modal').classList.remove('hidden');
+            document.getElementById('lecture-start-date').value = window.state.currentDate;
+            window.applySubjectDefaultName();
+            window.updateModalExpectedDate();
+        }
+
+        window.closeLectureModal = function() {
+            document.getElementById('lecture-modal').classList.add('hidden');
+            document.getElementById('lecture-form').reset();
+        }
+
+        // 인강 추가 처리
+        window.saveLecture = function(e) {
+            e.preventDefault();
+            const subject = document.getElementById('lecture-subject').value;
+            const title = document.getElementById('lecture-title').value.trim();
+            const total = parseInt(document.getElementById('lecture-total').value);
+            const daily = parseInt(document.getElementById('lecture-daily').value);
+            const current = parseInt(document.getElementById('lecture-current').value);
+            const startDate = document.getElementById('lecture-start-date').value;
+
+            if (current > total) {
+                window.showToast("현재 강의 수가 전체 수량보다 큽니다.", "error");
+                return;
+            }
+
+            const endDate = calculateExpectedEndDate(startDate, total, current, daily);
+
+            const newLecture = {
+                id: 'lec-' + Date.now(),
+                title,
+                total,
+                current,
+                daily,
+                color: subject, 
+                startDate,
+                endDate
+            };
+
+            window.state.lectures.push(newLecture);
+            allocateDailyTasksForDate(window.state.currentDate);
+
+            saveData();
+            window.updateUI();
+            window.closeLectureModal();
+            window.showToast("신규 강의가 완벽히 스케줄에 추가되었습니다.");
+        }
+
+        // 인강 삭제 (커스텀 컨펌 모달 활용)
+        window.deleteLecture = function(id) {
+            showCustomConfirm(
+                "인강 삭제 경고", 
+                "정말로 이 강의를 목록에서 완전히 삭제하시겠습니까? 관련된 오늘의 할 일도 함께 제거됩니다.", 
+                () => {
+                    window.state.lectures = window.state.lectures.filter(l => l.id !== id);
+                    window.state.tasks = window.state.tasks.filter(t => t.lectureId !== id);
+                    saveData();
+                    window.updateUI();
+                    window.showToast("인강 정보 및 오늘의 관련 과제가 제거되었습니다.");
+                }
+            );
+        }
+
+        // 일반 할 일 추가 모달 제어
+        window.openTaskModal = function() {
+            document.getElementById('task-modal').classList.remove('hidden');
+        }
+
+        window.closeTaskModal = function() {
+            document.getElementById('task-modal').classList.add('hidden');
+            document.getElementById('task-form').reset();
+        }
+
+        window.saveCustomTask = function(e) {
+            e.preventDefault();
+            const title = document.getElementById('task-title').value.trim();
+            
+            const newTask = {
+                id: 'task-custom-' + Date.now(),
+                title,
+                completed: false,
+                date: window.state.currentDate,
+                type: 'custom',
+                rolledOver: false
+            };
+
+            window.state.tasks.push(newTask);
+            saveData();
+            window.updateUI();
+            window.closeTaskModal();
+            window.showToast("할 일이 목록에 추가되었습니다.");
+        }
+
+        // 할 일 삭제
+        window.deleteCustomTask = function(taskId) {
+            const task = window.state.tasks.find(t => t.id === taskId);
+            if (task && task.type === 'milestone') {
+                window.showToast("수능 및 모의고사 일정은 삭제할 수 없는 중요 일정입니다.", "error");
+                return;
+            }
+
+            window.state.tasks = window.state.tasks.filter(t => t.id !== taskId);
+            saveData();
+            window.updateUI();
+            window.showToast("선택한 일정이 삭제되었습니다.");
+        }
+
+        // 투두 상태 토글
+        window.toggleTask = function(id) {
+            const task = window.state.tasks.find(t => t.id === id);
+            if (!task) return;
+
+            task.completed = !task.completed;
+
+            if (task.type === 'lecture' && task.lectureId) {
+                const lecture = window.state.lectures.find(l => l.id === task.lectureId);
+                if (lecture) {
+                    if (task.completed) {
+                        lecture.current = Math.min(lecture.total, lecture.current + 1);
+                    } else {
+                        lecture.current = Math.max(0, lecture.current - 1);
+                    }
+                    lecture.endDate = calculateExpectedEndDate(lecture.startDate, lecture.total, lecture.current, lecture.daily);
+                }
+            }
+
+            saveData();
+            window.updateUI();
+        }
+
+        // 이월 취소 기능
+        window.cancelRollover = function(taskId) {
+            const task = window.state.tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const previousDate = getPreviousDayDateString(window.state.currentDate);
+            task.date = previousDate;
+            task.rolledOver = false;
+
+            if (task.type === 'lecture') {
+                allocateDailyTasksForDate(window.state.currentDate);
+            }
+
+            saveData();
+            window.updateUI();
+            window.showToast("해당 할 일의 이월을 취소하고 이전 날로 복원했습니다.");
+        }
+
+        // 하루 뒤로 넘어가기 (자동 이월 실행 및 스트릭 적산)
+        window.advanceOneDay = function() {
+            const stateSnapshot = JSON.parse(JSON.stringify(window.state));
+            window.state.history.push(stateSnapshot);
+
+            const today = window.state.currentDate;
+            const tomorrow = getNextDayDateString(today);
+
+            const todayTasks = window.state.tasks.filter(t => t.date === today);
+            const incompleteTasks = todayTasks.filter(t => !t.completed);
+            const completeCount = todayTasks.filter(t => t.completed).length;
+
+            if (todayTasks.length > 0 && incompleteTasks.length === 0) {
+                window.state.streak += 1;
+            } else if (todayTasks.length > 0 && completeCount === 0) {
+                window.state.streak = 0;
+            }
+
+            const incompleteNormalTasks = incompleteTasks.filter(t => t.type !== 'milestone');
+
+            incompleteNormalTasks.forEach(task => {
+                task.date = tomorrow;
+                task.rolledOver = true;
+            });
+
+            window.state.currentDate = tomorrow;
+            allocateDailyTasksForDate(tomorrow);
+
+            saveData();
+            window.updateUI();
+            window.showToast("다음 날로 이동하였습니다. 미완료 일정들은 똑똑하게 자동 이월되었습니다.");
+        }
+
+        // 전체 이전 상태 복구 (실수 극복 롤백 메커니즘)
+        window.restorePreviousDay = function() {
+            if (window.state.history && window.state.history.length > 0) {
+                const prevState = window.state.history.pop();
+                
+                window.state.currentDate = prevState.currentDate;
+                window.state.lectures = prevState.lectures;
+                window.state.tasks = prevState.tasks;
+                window.state.streak = prevState.streak;
+                window.state.history = prevState.history;
+
+                saveData();
+                window.updateUI();
+                window.showToast("이전 날짜의 원본 정보로 완벽히 복원되었습니다.");
+            } else {
+                window.showToast("되돌릴 수 있는 이전 히스토리가 없습니다.", "error");
+            }
+        }
+
+        // 수동 날짜 수동 점프 제어기
+        window.jumpToSelectedDate = function(dateStr) {
+            if (!dateStr) return;
+            
+            const stateSnapshot = JSON.parse(JSON.stringify(window.state));
+            window.state.history.push(stateSnapshot);
+
+            window.state.currentDate = dateStr;
+            allocateDailyTasksForDate(dateStr);
+            
+            saveData();
+            window.updateUI();
+            window.showToast(`${dateStr}로 일정을 이동했습니다.`);
+        }
+
+        // 월별 캘린더 모달 열기 및 렌더링
+        window.openMonthlyCalendarModal = function() {
+            const currentDateObj = new Date(window.state.currentDate);
+            calendarYear = currentDateObj.getFullYear();
+            calendarMonth = currentDateObj.getMonth() + 1;
+
+            document.getElementById('calendar-modal').classList.remove('hidden');
+            renderCalendarGrid();
+        }
+
+        // 월별 캘린더 모달 닫기
+        window.closeMonthlyCalendarModal = function() {
+            document.getElementById('calendar-modal').classList.add('hidden');
+        }
+
+        // 달력 내 좌우 달 이동
+        window.moveCalendarMonth = function(direction) {
+            calendarMonth += direction;
+            if (calendarMonth > 12) {
+                calendarMonth = 1;
+                calendarYear += 1;
+            } else if (calendarMonth < 1) {
+                calendarMonth = 12;
+                calendarYear -= 1;
+            }
+            renderCalendarGrid();
+        }
+
+        // 월별 캘린더 달력 그리기 엔진
+        function renderCalendarGrid() {
+            const gridContainer = document.getElementById('calendar-grid');
+            const monthYearTitle = document.getElementById('calendar-month-year');
+            
+            monthYearTitle.innerText = `${calendarYear}년 ${String(calendarMonth).padStart(2, '0')}월`;
+            gridContainer.innerHTML = '';
+
+            const firstDayIndex = new Date(calendarYear, calendarMonth - 1, 1).getDay();
+            const totalDaysInMonth = new Date(calendarYear, calendarMonth, 0).getDate();
+
+            // 1. 공백 일수 추가
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = "aspect-square bg-slate-50/40 rounded-lg";
+                gridContainer.appendChild(emptyCell);
+            }
+
+            // 2. 날짜 칸 렌더링 루프
+            for (let day = 1; day <= totalDaysInMonth; day++) {
+                const dayStr = `${calendarYear}-${String(calendarMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                const dayTasks = window.state.tasks.filter(t => t.date === dayStr);
+                const dayTotal = dayTasks.length;
+                const dayCompleted = dayTasks.filter(t => t.completed).length;
+
+                const isCurrentSimulatedDate = (dayStr === window.state.currentDate);
+
+                const dayOfWeek = new Date(calendarYear, calendarMonth - 1, day).getDay();
+                let dayNumColor = "text-slate-800";
+                if (dayOfWeek === 0) dayNumColor = "text-rose-500 font-bold";
+                else if (dayOfWeek === 6) dayNumColor = "text-sky-500 font-bold";
+
+                let progressBadgeHTML = '';
+                if (dayTotal > 0) {
+                    if (dayCompleted === dayTotal) {
+                        progressBadgeHTML = `<span class="text-[9px] font-black text-white bg-emerald-500 px-1.5 py-0.5 rounded shadow-xs">${dayCompleted}/${dayTotal} 완수</span>`;
+                    } else {
+                        progressBadgeHTML = `<span class="text-[9px] font-black text-white bg-amber-500 px-1.5 py-0.5 rounded shadow-xs">${dayCompleted}/${dayTotal} 진행</span>`;
+                    }
+                } else {
+                    progressBadgeHTML = `<span class="text-[8px] text-slate-300 font-bold">계획 없음</span>`;
+                }
+
+                const dayCell = document.createElement('div');
+                dayCell.className = `aspect-square p-2 rounded-xl border flex flex-col justify-between cursor-pointer transition-all hover:scale-102 hover:shadow-md ${
+                    isCurrentSimulatedDate 
+                    ? 'border-indigo-600 bg-indigo-50/50 shadow-inner' 
+                    : 'border-slate-100 hover:border-indigo-200 bg-white'
+                }`;
+                dayCell.setAttribute('onclick', `jumpToSelectedDate('${dayStr}'); closeMonthlyCalendarModal();`);
+
+                dayCell.innerHTML = `
+                    <div class="flex items-center justify-between w-full">
+                        <span class="text-xs font-black ${dayNumColor}">${day}</span>
+                        ${isCurrentSimulatedDate ? `<span class="text-[9px] bg-indigo-600 text-white font-extrabold px-1 rounded">오늘</span>` : ''}
+                    </div>
+                    <div class="text-center w-full mt-1">
+                        ${progressBadgeHTML}
+                    </div>
+                `;
+
+                gridContainer.appendChild(dayCell);
+            }
+        }
+
+        window.toggleApiSettings = function() {
+            const panel = document.getElementById('api-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        window.saveApiKey = function() {
+            const key = document.getElementById('api-key-input').value.trim();
+            window.state.apiKey = key;
+            saveData();
+            window.showToast("API 키가 안전하게 로컬에 등록되었습니다.");
+            window.toggleApiSettings();
+        }
+
+        // 전체 UI 통합 동기화 프레임워크
+        window.updateUI = function() {
+            calculateCsatDday();
+            updateNationalQuote();
+
+            document.getElementById('stat-date').innerText = window.state.currentDate;
+            document.getElementById('stat-streak').innerText = `${window.state.streak}일째`;
+            
+            const completedCount = window.state.lectures.filter(l => l.current >= l.total).length;
+            document.getElementById('stat-completed-lectures').innerText = `${completedCount}개`;
+
+            const todayTasks = window.state.tasks.filter(t => t.date === window.state.currentDate);
+            const totalTasksCount = todayTasks.length;
+            const completedTasksCount = todayTasks.filter(t => t.completed).length;
+            
+            const progressPercent = totalTasksCount === 0 ? 0 : Math.round((completedTasksCount / totalTasksCount) * 100);
+            document.getElementById('stat-progress').innerText = `${progressPercent}%`;
+
+            const btnRestore = document.getElementById('btn-restore');
+            if (window.state.history.length === 0) {
+                btnRestore.classList.add('opacity-40', 'cursor-not-allowed');
+            } else {
+                btnRestore.classList.remove('opacity-40', 'cursor-not-allowed');
+            }
+
+            // 오늘의 학습 일정 렌더링
+            const todoListContainer = document.getElementById('todo-list');
+            if (todayTasks.length === 0) {
+                todoListContainer.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fa-solid fa-mug-hot text-xl"></i>
+                        </div>
+                        <p class="text-xs font-bold text-slate-400">오늘 할 일이 비어 있습니다.</p>
+                        <p class="text-[10px] text-slate-400 mt-1">우측의 새 인강을 등록하거나 할 일을 직접 추가하여 스케줄을 시작해 보세요!</p>
+                    </div>
+                `;
+            } else {
+                todoListContainer.innerHTML = '';
+                todayTasks.forEach(task => {
+                    const isChecked = task.completed;
+                    const div = document.createElement('div');
+                    
+                    if (task.type === 'milestone') {
+                        div.className = "flex items-center justify-between py-4 px-4 rounded-xl border-l-4 border-l-rose-600 border border-rose-200 bg-rose-50/70 shadow-sm important-pulse";
+                        div.innerHTML = `
+                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                <button onclick="toggleTask('${task.id}')" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-colors ${
+                                    isChecked 
+                                    ? 'bg-rose-600 border-rose-600 text-white' 
+                                    : 'border-rose-400 hover:border-rose-600 text-transparent bg-white'
+                                }">
+                                    <i class="fa-solid fa-check text-[11px] pointer-events-none"></i>
+                                </button>
+                                <div class="min-w-0 flex-1">
+                                    <span class="text-sm font-black block truncate transition-all ${isChecked ? 'line-through text-rose-400/80' : 'text-rose-950'}">
+                                        ${task.title}
+                                    </span>
+                                    <div class="flex items-center space-x-2 mt-0.5">
+                                        <span class="text-[9px] font-black uppercase tracking-wider text-white bg-rose-600 px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
+                                            <i class="fa-solid fa-circle-exclamation text-[10px]"></i> 필수 중요 일정
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1.5 shrink-0 pl-2">
+                                <span class="text-rose-500 font-bold text-xs bg-rose-100 px-2 py-1 rounded-md border border-rose-200">수능 필수 관문</span>
+                            </div>
+                        `;
+                    } else {
+                        div.className = "flex items-center justify-between py-3.5 group transition-colors hover:bg-slate-50/50 px-2 rounded-xl";
+                        div.innerHTML = `
+                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                <button onclick="toggleTask('${task.id}')" class="w-5.5 h-5.5 rounded-lg border-2 flex items-center justify-center shrink-0 transition-colors ${
+                                    isChecked 
+                                    ? 'bg-indigo-600 border-indigo-600 text-white' 
+                                    : 'border-slate-300 hover:border-indigo-400 text-transparent'
+                                }">
+                                    <i class="fa-solid fa-check text-[10px] pointer-events-none"></i>
+                                </button>
+                                <div class="min-w-0 flex-1">
+                                    <span class="text-sm font-bold block truncate transition-all ${isChecked ? 'line-through text-slate-400' : 'text-slate-800'}">
+                                        ${task.title}
+                                    </span>
+                                    <div class="flex items-center space-x-2 mt-0.5">
+                                        <span class="text-[9px] font-black uppercase tracking-wider ${task.type === 'lecture' ? 'text-indigo-500 bg-indigo-50 px-1 py-0.2 rounded' : 'text-emerald-500 bg-emerald-50 px-1 py-0.2 rounded'}">
+                                            ${task.type === 'lecture' ? '인강 학습' : '일반 할일'}
+                                        </span>
+                                        ${task.rolledOver ? `
+                                            <span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-1 rounded flex items-center">
+                                                <i class="fa-solid fa-clock-rotate-left mr-0.5 text-[8px]"></i> 이월됨 ↩
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                ${task.rolledOver ? `
+                                    <button onclick="cancelRollover('${task.id}')" class="text-[10px] font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded-md transition" title="이월 취소">
+                                        이월 취소
+                                    </button>
+                                ` : ''}
+                                <button onclick="deleteCustomTask('${task.id}')" class="text-slate-300 hover:text-rose-500 p-1.5 transition" title="삭제">
+                                    <i class="fa-regular fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+                    todoListContainer.appendChild(div);
+                });
+            }
+
+            // 수강 중인 인강 카드 렌더링
+            const lectureListContainer = document.getElementById('lecture-list');
+            if (window.state.lectures.length === 0) {
+                lectureListContainer.innerHTML = `
+                    <div class="text-center py-8 border border-dashed border-slate-200 rounded-xl bg-slate-50">
+                        <p class="text-xs text-slate-400">수강 중인 인강이 없습니다.</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">상단 우측의 '새 인강 등록'을 눌러 공부를 시작하세요!</p>
+                    </div>
+                `;
+            } else {
+                lectureListContainer.innerHTML = '';
+                window.state.lectures.forEach(lecture => {
+                    const theme = colorClasses[lecture.color] || colorClasses.korean;
+                    const progressPercent = Math.min(100, Math.round((lecture.current / lecture.total) * 100));
+                    
+                    const startDateText = lecture.startDate || '미지정';
+                    const endDateText = lecture.endDate || '계산 중';
+                    
+                    let dDayHTML = '';
+                    if (lecture.endDate && progressPercent < 100) {
+                        const currTime = new Date(window.state.currentDate).getTime();
+                        const endTime = new Date(lecture.endDate).getTime();
+                        const diffDays = Math.ceil((endTime - currTime) / (1000 * 60 * 60 * 24));
+                        
+                        if (diffDays > 0) {
+                            dDayHTML = `<span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded-md shrink-0 border border-rose-100/60 ml-2">완강 D-${diffDays}</span>`;
+                        } else if (diffDays === 0) {
+                            dDayHTML = `<span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md shrink-0 border border-amber-100/60 ml-2">오늘 완강 예정!</span>`;
+                        } else {
+                            dDayHTML = `<span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md shrink-0 ml-2">기간 종료</span>`;
+                        }
+                    }
+
+                    const item = document.createElement('div');
+                    item.className = `p-4 rounded-xl border ${theme.border} bg-white space-y-3 relative overflow-hidden group shadow-sm`;
+                    
+                    item.innerHTML = `
+                        <div class="flex items-start justify-between">
+                            <div class="min-w-0 pr-6 flex-1">
+                                <div class="flex items-center justify-between gap-1">
+                                    <div class="flex items-center space-x-1.5 truncate">
+                                        <span class="text-[9px] font-black text-white ${theme.bg} px-1.5 py-0.5 rounded shrink-0">${theme.name}</span>
+                                        <h4 class="text-sm font-bold text-slate-900 truncate">${lecture.title}</h4>
+                                    </div>
+                                    ${dDayHTML}
+                                </div>
+                                <div class="flex items-center space-x-1.5 mt-1.5 flex-wrap gap-y-1">
+                                    <span class="text-[10px] font-semibold text-slate-500 bg-slate-100 rounded-md px-1.5 py-0.5 inline-block shrink-0">
+                                        하루 목표: ${lecture.daily}강씩 수강
+                                    </span>
+                                    <span class="text-[10px] font-semibold text-indigo-500 bg-indigo-50/50 rounded-md px-1.5 py-0.5 inline-block shrink-0">
+                                        학습 일정: ${startDateText} ~ ${endDateText}
+                                    </span>
+                                </div>
+                            </div>
+                            <button onclick="deleteLecture('${lecture.id}')" class="absolute right-3 top-3 text-slate-300 hover:text-rose-500 transition opacity-0 group-hover:opacity-100 p-1" title="인강 정보 삭제">
+                                <i class="fa-regular fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-600">
+                                <span>진도 완수 현황</span>
+                                <span class="font-bold text-slate-800">${lecture.current} / ${lecture.total}강 (${progressPercent}%)</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="${theme.accent} h-1.5 rounded-full transition-all duration-300" style="width: ${progressPercent}%"></div>
+                            </div>
+                        </div>
+
+                        ${progressPercent >= 100 ? `
+                        <div class="absolute inset-0 bg-emerald-500/10 backdrop-blur-[0.5px] flex items-center justify-center">
+                            <div class="bg-white/95 px-3 py-1.5 rounded-full shadow-md border border-emerald-100 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-trophy text-amber-500 text-xs"></i>
+                                <span class="text-xs font-bold text-emerald-800">완강 축하합니다! 🎉</span>
+                            </div>
+                        </div>` : ''}
+                    `;
+                    lectureListContainer.appendChild(item);
+                });
+            }
+        }
+
+        // AI 학습 탭 기어 체인저
+        window.switchAiTab = function(tab) {
+            const tabMentor = document.getElementById('ai-tab-mentor');
+            const tabPlanner = document.getElementById('ai-tab-planner');
+            const btnMentor = document.getElementById('tab-btn-mentor');
+            const btnPlanner = document.getElementById('tab-btn-planner');
+
+            if (tab === 'mentor') {
+                tabMentor.classList.remove('hidden');
+                tabPlanner.classList.add('hidden');
+                btnMentor.className = "py-1.5 rounded-lg text-center bg-white text-slate-900 shadow-sm transition";
+                btnPlanner.className = "py-1.5 rounded-lg text-center hover:bg-white/50 transition";
+            } else {
+                tabMentor.classList.add('hidden');
+                tabPlanner.classList.remove('hidden');
+                btnMentor.className = "py-1.5 rounded-lg text-center hover:bg-white/50 transition";
+                btnPlanner.className = "py-1.5 rounded-lg text-center bg-white text-slate-900 shadow-sm transition";
+            }
+        }
+
+        // AI 챗봇 멘토 대화 처리
+        window.sendAiChat = async function() {
+            const input = document.getElementById('ai-chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatWindow = document.getElementById('ai-chat-window');
+            
+            chatWindow.innerHTML += `
+                <div class="bg-indigo-50 border border-indigo-100/60 p-2 rounded-lg text-right max-w-[85%] ml-auto text-slate-800 font-medium">
+                    ${message}
+                </div>
+            `;
+            input.value = '';
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            const loadingId = 'loading-' + Date.now();
+            chatWindow.innerHTML += `
+                <div id="${loadingId}" class="bg-white border border-slate-100 p-2 rounded-lg text-slate-400">
+                    <i class="fa-solid fa-circle-notch animate-spin mr-1.5"></i> 멘토가 생각하고 있습니다...
+                </div>
+            `;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            try {
+                const prompt = `
+                당신은 2027학년도 인서울 수능 대학 합격을 진심으로 바라는 다정하고 예리한 수능 멘토입니다.
+                사용자의 고민이나 질문에 대해 성심성의껏 존댓말로 3줄 이내로 핵심 위주 처방을 제시해 주세요.
+                현재 플래너 가상 시점은 ${window.state.currentDate} 이며, 수능 목표일은 2026년 11월 19일입니다.
+                `;
+                
+                const response = await callGeminiAPI(message, prompt);
+                document.getElementById(loadingId).remove();
+
+                chatWindow.innerHTML += `
+                    <div class="bg-white border border-slate-100 p-2.5 rounded-lg text-slate-700 leading-relaxed shadow-sm">
+                        <strong class="text-indigo-600">💡 AI 학습 멘토</strong><br>${response.replace(/\n/g, '<br>')}
+                    </div>
+                `;
+            } catch (err) {
+                document.getElementById(loadingId).remove();
+                chatWindow.innerHTML += `
+                    <div class="bg-rose-50 border border-rose-100 text-rose-700 p-2.5 rounded-lg">
+                        ⚠️ API 키 설정을 확인하거나 잠시 후 다시 시도해 주세요.
+                    </div>
+                `;
+            }
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // AI 마이크로 계획 쪼개기 구현
+        window.generateAiPlan = async function() {
+            const topic = document.getElementById('ai-plan-topic').value.trim();
+            if (!topic) {
+                window.showToast("세분화하고 싶은 공부 주제를 적어주세요.", "error");
+                return;
+            }
+
+            const btn = document.getElementById('btn-generate-plan');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-1.5"></i> 최적 실천 단계 계산 중...`;
+
+            const responseSchema = {
+                type: "OBJECT",
+                properties: {
+                    tasks: {
+                        type: "ARRAY",
+                        description: "당장 오늘 실천 가능한 마이크로 단위 3단계 태스크",
+                        items: {
+                            type: "STRING"
+                        }
+                    }
+                },
+                required: ["tasks"]
+            };
+
+            const systemPrompt = `
+            당신은 복잡하고 광범위한 수능 학습 계획을 오늘 즉시 실행 가능한 초정밀 마이크로 스케줄 3단계로 정확히 배분해 주는 AI 플래너입니다.
+            각 과정은 구체적이며 한글로 명확하게 반환하여야 합니다.
+            결과는 schema를 완전히 충족하는 JSON이어야 합니다.
+            `;
+
+            try {
+                const responseText = await callGeminiAPI(topic, systemPrompt, responseSchema);
+                const result = JSON.parse(responseText);
+                
+                if (result && result.tasks && result.tasks.length > 0) {
+                    tempAiPlanTasks = result.tasks;
+                    const listEl = document.getElementById('ai-plan-list');
+                    listEl.innerHTML = '';
+                    tempAiPlanTasks.forEach(task => {
+                        listEl.innerHTML += `<li class="font-bold text-slate-800">${task}</li>`;
+                    });
+
+                    document.getElementById('ai-plan-result').classList.remove('hidden');
+                    window.showToast("AI가 성공적으로 맞춤 3단계를 도출했습니다!");
+                }
+            } catch (err) {
+                console.error(err);
+                window.showToast("스케줄링 도출에 실패했습니다. API 키를 재설정해 보세요.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // 도출한 마이크로 플랜을 오늘 투두로 원클릭 배포
+        window.importAiTasks = function() {
+            if (tempAiPlanTasks.length === 0) return;
+
+            tempAiPlanTasks.forEach((taskTitle, idx) => {
+                const newTask = {
+                    id: 'task-ai-import-' + Date.now() + '-' + idx,
+                    title: `[AI추천] ${taskTitle}`,
+                    completed: false,
+                    date: window.state.currentDate,
+                    type: 'custom',
+                    rolledOver: false
+                };
+                window.state.tasks.push(newTask);
+            });
+
+            saveData();
+            window.updateUI();
+            
+            document.getElementById('ai-plan-topic').value = '';
+            document.getElementById('ai-plan-result').classList.add('hidden');
+            window.showToast("AI가 제안한 3가지 할 일이 오늘 일정에 편입되었습니다.");
+        }
+
+        // 페이지 기동 시 작동 엔진 시작
+        window.addEventListener('load', () => {
+            loadData();
+            allocateDailyTasksForDate(window.state.currentDate);
+            window.updateUI();
+        });
+    </script>
+</body>
+</html>
